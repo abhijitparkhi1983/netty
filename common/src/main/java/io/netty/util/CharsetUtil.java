@@ -175,5 +175,20 @@ public final class CharsetUtil {
         return d;
     }
 
+    public static CharsetDecoder decoder1(Charset charset) {
+        requireNonNull(charset, "charset");
+
+        Map<Charset, CharsetDecoder> map = InternalThreadLocalMap.get().charsetDecoderCache();
+        CharsetDecoder d = map.get(charset);
+        if (d != null) {
+            d.reset().onMalformedInput(CodingErrorAction.REPLACE).onUnmappableCharacter(CodingErrorAction.REPLACE);
+            return d;
+        }
+
+        d = decoder(charset, CodingErrorAction.REPLACE, CodingErrorAction.REPLACE);
+        map.put(charset, d);
+        return d;
+    }
+
     private CharsetUtil() { }
 }
